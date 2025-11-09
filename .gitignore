@@ -39,6 +39,7 @@ Ballerina.lock
 
 *.DS_Store
 *.ctx
+.claude-tasks
 
 #Ballerina
 Config.toml
