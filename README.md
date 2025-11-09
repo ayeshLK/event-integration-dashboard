@@ -39,15 +39,9 @@ The Event Integration team maintains various products, Ballerina modules, and to
 
 ## Tools
 
-| Tool | Organization | Latest Release | Open Issues | Open PRs | Build Status |
-|------|--------------|----------------|-------------|----------|-------------|
-| [tool.asyncapi](https://github.com/ballerina-platform/asyncapi-tools) | ballerina | v0.12.0 | [0](https://github.com/ballerina-platform/asyncapi-tools/issues) | [1](https://github.com/ballerina-platform/asyncapi-tools/pulls) | [![Build](https://github.com/ballerina-platform/asyncapi-tools/workflows/Build/badge.svg)](https://github.com/ballerina-platform/asyncapi-tools/actions) |
-
-### Issue Labels
-
-| Tool | Library Label | BI Label |
-|------|---------------|----------|
-| tool.asyncapi | [module/asyncapi-tools](https://github.com/ballerina-platform/ballerina-library/issues?q=is:open+label:module%2Fasyncapi-tools) | [eventintegration/asyncapi](https://github.com/wso2/product-ballerina-integrator/issues?q=is:open+label:eventintegration%2Fasyncapi) |
+| Tool Name | Latest Release | Open Library Issues | Open BI Issues | Open Tool PRs | Build Status | Code Coverage |
+|-----------|----------------|---------------------|----------------|---------------|--------------|---------------|
+| [tool.asyncapi](https://github.com/ballerina-platform/asyncapi-tools) | v0.12.0 | [8](https://github.com/ballerina-platform/ballerina-library/issues?q=is:open+label:module%2Fasyncapi-tools) | [0](https://github.com/wso2/product-ballerina-integrator/issues?q=is:open+label:eventintegration%2Fasyncapi) | [1](https://github.com/ballerina-platform/asyncapi-tools/pulls) | [![Build](https://github.com/ballerina-platform/asyncapi-tools/workflows/Build/badge.svg)](https://github.com/ballerina-platform/asyncapi-tools/actions) | [![codecov](https://codecov.io/gh/ballerina-platform/asyncapi-tools/branch/main/graph/badge.svg)](https://codecov.io/gh/ballerina-platform/asyncapi-tools) |
 
 ---
 

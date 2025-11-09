@@ -207,9 +207,14 @@ public function fetchToolInfo(GitHubClient github, Tool tool) returns ToolInfo|e
 
     GitHubRepo repoInfo = check getRepoInfo(github, githubOrg, toolRepo);
     string latestRelease = check getLatestRelease(github, githubOrg, toolRepo);
-    int openIssues = check getOpenIssuesCount(github, githubOrg, toolRepo);
     int openPRs = check getOpenPRsCount(github, githubOrg, toolRepo);
     boolean hasBuild = hasGitHubActions(github, githubOrg, toolRepo);
+
+    // Fetch library issues (from ballerina-library repo with specific label)
+    int openLibraryIssues = check getIssuesByLabel(github, "ballerina-platform", "ballerina-library", tool.'library\-label);
+
+    // Fetch BI issues (from product-ballerina-integrator repo with specific label)
+    int openBIIssues = check getIssuesByLabel(github, "wso2", "product-ballerina-integrator", tool.'bi\-label);
 
     return {
         name: tool.name,
@@ -219,9 +224,11 @@ public function fetchToolInfo(GitHubClient github, Tool tool) returns ToolInfo|e
         libraryLabel: tool.'library\-label,
         biLabel: tool.'bi\-label,
         defaultBranch: repoInfo.default_branch,
-        openIssues: openIssues,
+        openLibraryIssues: openLibraryIssues,
+        openBIIssues: openBIIssues,
         openPRs: openPRs,
         latestRelease: latestRelease,
-        hasBuild: hasBuild
+        hasBuild: hasBuild,
+        codeCoverage: () // TODO: Fetch from CodeCov API if needed
     };
 }

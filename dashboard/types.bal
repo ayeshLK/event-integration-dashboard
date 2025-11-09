@@ -77,10 +77,12 @@ public type ToolInfo record {
     string libraryLabel;
     string biLabel;
     string defaultBranch;
-    int openIssues;
+    int openLibraryIssues;
+    int openBIIssues;
     int openPRs;
     string latestRelease;
     boolean hasBuild;
+    string? codeCoverage;
 };
 
 // GitHub API response types

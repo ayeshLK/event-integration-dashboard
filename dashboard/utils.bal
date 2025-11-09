@@ -81,32 +81,23 @@ function generateModulesSection(ModuleInfo[] modules) returns string {
 // Generate tools section for dashboard
 function generateToolsSection(ToolInfo[] tools) returns string {
     string dashboard = "## Tools" + "\n\n";
-    dashboard += "| Tool | Organization | Latest Release | Open Issues | Open PRs | Build Status |" + "\n";
-    dashboard += "|------|--------------|----------------|-------------|----------|-------------|" + "\n";
+    dashboard += "| Tool Name | Latest Release | Open Library Issues | Open BI Issues | Open Tool PRs | Build Status | Code Coverage |" + "\n";
+    dashboard += "|-----------|----------------|---------------------|----------------|---------------|--------------|---------------|" + "\n";
 
     foreach ToolInfo tool in tools {
         string toolLink = string `[${tool.name}](https://github.com/${tool.githubOrg}/${tool.toolRepo})`;
         string buildBadge = tool.hasBuild ?
             string `[![Build](https://github.com/${tool.githubOrg}/${tool.toolRepo}/workflows/Build/badge.svg)](https://github.com/${tool.githubOrg}/${tool.toolRepo}/actions)` :
             "N/A";
+        string coverageBadge = string `[![codecov](https://codecov.io/gh/${tool.githubOrg}/${tool.toolRepo}/branch/${tool.defaultBranch}/graph/badge.svg)](https://codecov.io/gh/${tool.githubOrg}/${tool.toolRepo})`;
 
-        string issuesLink = string `[${tool.openIssues}](https://github.com/${tool.githubOrg}/${tool.toolRepo}/issues)`;
-        string prsLink = string `[${tool.openPRs}](https://github.com/${tool.githubOrg}/${tool.toolRepo}/pulls)`;
-
-        dashboard += string `| ${toolLink} | ${tool.org} | ${tool.latestRelease} | ${issuesLink} | ${prsLink} | ${buildBadge} |` + "\n";
-    }
-
-    dashboard += "\n" + "### Issue Labels" + "\n\n";
-    dashboard += "| Tool | Library Label | BI Label |" + "\n";
-    dashboard += "|------|---------------|----------|" + "\n";
-
-    foreach ToolInfo tool in tools {
         string encodedLibraryLabel = urlEncode(tool.libraryLabel);
         string encodedBiLabel = urlEncode(tool.biLabel);
-        string libraryLink = string `[${tool.libraryLabel}](https://github.com/ballerina-platform/ballerina-library/issues?q=is:open+label:${encodedLibraryLabel})`;
-        string biLink = string `[${tool.biLabel}](https://github.com/wso2/product-ballerina-integrator/issues?q=is:open+label:${encodedBiLabel})`;
+        string libraryIssuesLink = string `[${tool.openLibraryIssues}](https://github.com/ballerina-platform/ballerina-library/issues?q=is:open+label:${encodedLibraryLabel})`;
+        string biIssuesLink = string `[${tool.openBIIssues}](https://github.com/wso2/product-ballerina-integrator/issues?q=is:open+label:${encodedBiLabel})`;
+        string prsLink = string `[${tool.openPRs}](https://github.com/${tool.githubOrg}/${tool.toolRepo}/pulls)`;
 
-        dashboard += string `| ${tool.name} | ${libraryLink} | ${biLink} |` + "\n";
+        dashboard += string `| ${toolLink} | ${tool.latestRelease} | ${libraryIssuesLink} | ${biIssuesLink} | ${prsLink} | ${buildBadge} | ${coverageBadge} |` + "\n";
     }
 
     return dashboard;
