@@ -59,7 +59,8 @@ To add a new product, module, or tool to the dashboard:
    - `/add-new-product` - Add a new product
    - `/add-new-module` - Add a new Ballerina module
    - `/add-new-tool` - Add a new Ballerina tool
-   - `/init-ctx` - Initialize the context for this project and save it in `.claude.ctx` file
+   - `/init-ctx` - Analyze and refresh the context for this project and save it in `.claude.ctx` file
+   - `/load-ctx` - Load project context from .claude.ctx file (quick initialization)
 3. **Manually**: Edit `packages.json` following the structure defined in [developer-guide.md](developer-guide.md)
 
 ## Dashboard Generation
