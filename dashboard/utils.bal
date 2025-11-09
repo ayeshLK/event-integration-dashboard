@@ -56,72 +56,23 @@ function generateProductsSection(ProductInfo[] products) returns string {
 // Generate modules section for dashboard
 function generateModulesSection(ModuleInfo[] modules) returns string {
     string dashboard = "## Modules" + "\n\n";
-
-    // Separate modules by organization
-    ModuleInfo[] ballerinaModules = [];
-    ModuleInfo[] ballerinaxModules = [];
+    dashboard += "| Module Name | Latest Release | Open Library Issues | Open BI Issues | Open Module PRs | Build Status | Code Coverage |" + "\n";
+    dashboard += "|-------------|----------------|---------------------|----------------|-----------------|--------------|---------------|" + "\n";
 
     foreach ModuleInfo module in modules {
-        if module.org == "ballerina" {
-            ballerinaModules.push(module);
-        } else {
-            ballerinaxModules.push(module);
-        }
-    }
+        string moduleLink = string `[${module.name}](https://github.com/${module.githubOrg}/${module.moduleRepo})`;
+        string buildBadge = module.hasBuild ?
+            string `[![Build](https://github.com/${module.githubOrg}/${module.moduleRepo}/workflows/Build/badge.svg)](https://github.com/${module.githubOrg}/${module.moduleRepo}/actions)` :
+            "N/A";
+        string coverageBadge = string `[![codecov](https://codecov.io/gh/${module.githubOrg}/${module.moduleRepo}/branch/${module.defaultBranch}/graph/badge.svg)](https://codecov.io/gh/${module.githubOrg}/${module.moduleRepo})`;
 
-    // Ballerina modules section
-    if ballerinaModules.length() > 0 {
-        dashboard += "### Ballerina Standard Library Modules" + "\n\n";
-        dashboard += "| Module | Latest Release | Open Issues | Open PRs | Build Status | Code Coverage |" + "\n";
-        dashboard += "|--------|----------------|-------------|----------|--------------|---------------|" + "\n";
-
-        foreach ModuleInfo module in ballerinaModules {
-            string moduleLink = string `[${module.name}](https://github.com/${module.githubOrg}/${module.moduleRepo})`;
-            string buildBadge = module.hasBuild ?
-                string `[![Build](https://github.com/${module.githubOrg}/${module.moduleRepo}/workflows/Build/badge.svg)](https://github.com/${module.githubOrg}/${module.moduleRepo}/actions)` :
-                "N/A";
-            string coverageBadge = string `[![codecov](https://codecov.io/gh/${module.githubOrg}/${module.moduleRepo}/branch/${module.defaultBranch}/graph/badge.svg)](https://codecov.io/gh/${module.githubOrg}/${module.moduleRepo})`;
-
-            string issuesLink = string `[${module.openIssues}](https://github.com/${module.githubOrg}/${module.moduleRepo}/issues)`;
-            string prsLink = string `[${module.openPRs}](https://github.com/${module.githubOrg}/${module.moduleRepo}/pulls)`;
-
-            dashboard += string `| ${moduleLink} | ${module.latestRelease} | ${issuesLink} | ${prsLink} | ${buildBadge} | ${coverageBadge} |` + "\n";
-        }
-        dashboard += "\n";
-    }
-
-    // Ballerinax modules section
-    if ballerinaxModules.length() > 0 {
-        dashboard += "### Ballerinax Extended Modules" + "\n\n";
-        dashboard += "| Module | Latest Release | Open Issues | Open PRs | Build Status | Code Coverage |" + "\n";
-        dashboard += "|--------|----------------|-------------|----------|--------------|---------------|" + "\n";
-
-        foreach ModuleInfo module in ballerinaxModules {
-            string moduleLink = string `[${module.name}](https://github.com/${module.githubOrg}/${module.moduleRepo})`;
-            string buildBadge = module.hasBuild ?
-                string `[![Build](https://github.com/${module.githubOrg}/${module.moduleRepo}/workflows/Build/badge.svg)](https://github.com/${module.githubOrg}/${module.moduleRepo}/actions)` :
-                "N/A";
-            string coverageBadge = string `[![codecov](https://codecov.io/gh/${module.githubOrg}/${module.moduleRepo}/branch/${module.defaultBranch}/graph/badge.svg)](https://codecov.io/gh/${module.githubOrg}/${module.moduleRepo})`;
-
-            string issuesLink = string `[${module.openIssues}](https://github.com/${module.githubOrg}/${module.moduleRepo}/issues)`;
-            string prsLink = string `[${module.openPRs}](https://github.com/${module.githubOrg}/${module.moduleRepo}/pulls)`;
-
-            dashboard += string `| ${moduleLink} | ${module.latestRelease} | ${issuesLink} | ${prsLink} | ${buildBadge} | ${coverageBadge} |` + "\n";
-        }
-        dashboard += "\n";
-    }
-
-    dashboard += "### Issue Labels" + "\n\n";
-    dashboard += "| Module | Library Label | BI Label |" + "\n";
-    dashboard += "|--------|---------------|----------|" + "\n";
-
-    foreach ModuleInfo module in modules {
         string encodedLibraryLabel = urlEncode(module.libraryLabel);
         string encodedBiLabel = urlEncode(module.biLabel);
-        string libraryLink = string `[${module.libraryLabel}](https://github.com/ballerina-platform/ballerina-library/issues?q=is:open+label:${encodedLibraryLabel})`;
-        string biLink = string `[${module.biLabel}](https://github.com/wso2/product-ballerina-integrator/issues?q=is:open+label:${encodedBiLabel})`;
+        string libraryIssuesLink = string `[${module.openLibraryIssues}](https://github.com/ballerina-platform/ballerina-library/issues?q=is:open+label:${encodedLibraryLabel})`;
+        string biIssuesLink = string `[${module.openBIIssues}](https://github.com/wso2/product-ballerina-integrator/issues?q=is:open+label:${encodedBiLabel})`;
+        string prsLink = string `[${module.openPRs}](https://github.com/${module.githubOrg}/${module.moduleRepo}/pulls)`;
 
-        dashboard += string `| ${module.name} | ${libraryLink} | ${biLink} |` + "\n";
+        dashboard += string `| ${moduleLink} | ${module.latestRelease} | ${libraryIssuesLink} | ${biIssuesLink} | ${prsLink} | ${buildBadge} | ${coverageBadge} |` + "\n";
     }
 
     return dashboard;

@@ -61,7 +61,8 @@ public type ModuleInfo record {
     string libraryLabel;
     string biLabel;
     string defaultBranch;
-    int openIssues;
+    int openLibraryIssues;
+    int openBIIssues;
     int openPRs;
     string latestRelease;
     boolean hasBuild;

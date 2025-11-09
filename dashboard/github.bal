@@ -75,6 +75,30 @@ public function getOpenPRsCount(GitHubClient github, string org, string repo) re
     return pulls.length();
 }
 
+// Fetch issues count by label from a repository
+public function getIssuesByLabel(GitHubClient github, string org, string repo, string label) returns int|error {
+    string path = string `/repos/${org}/${repo}/issues?state=open&labels=${label}`;
+    json[]|error issues = github->get(path);
+
+    if issues is error {
+        log:printWarn(string `Failed to fetch issues for ${org}/${repo} with label ${label}: ${issues.message()}`);
+        return 0;
+    }
+
+    // Filter out pull requests (issues API returns both issues and PRs)
+    int count = 0;
+    foreach json issue in issues {
+        if issue is map<json> {
+            // Check if this is a pull request by looking for 'pull_request' field
+            if !issue.hasKey("pull_request") {
+                count += 1;
+            }
+        }
+    }
+
+    return count;
+}
+
 // Check if repository has GitHub Actions workflow
 public function hasGitHubActions(GitHubClient github, string org, string repo) returns boolean {
     string path = string `/repos/${org}/${repo}/actions/workflows`;
@@ -150,9 +174,14 @@ public function fetchModuleInfo(GitHubClient github, Module module) returns Modu
 
     GitHubRepo repoInfo = check getRepoInfo(github, githubOrg, moduleRepo);
     string latestRelease = check getLatestRelease(github, githubOrg, moduleRepo);
-    int openIssues = check getOpenIssuesCount(github, githubOrg, moduleRepo);
     int openPRs = check getOpenPRsCount(github, githubOrg, moduleRepo);
     boolean hasBuild = hasGitHubActions(github, githubOrg, moduleRepo);
+
+    // Fetch library issues (from ballerina-library repo with specific label)
+    int openLibraryIssues = check getIssuesByLabel(github, "ballerina-platform", "ballerina-library", libraryLabel);
+
+    // Fetch BI issues (from product-ballerina-integrator repo with specific label)
+    int openBIIssues = check getIssuesByLabel(github, "wso2", "product-ballerina-integrator", biLabel);
 
     return {
         name: module.name,
@@ -162,7 +191,8 @@ public function fetchModuleInfo(GitHubClient github, Module module) returns Modu
         libraryLabel: libraryLabel,
         biLabel: biLabel,
         defaultBranch: repoInfo.default_branch,
-        openIssues: openIssues,
+        openLibraryIssues: openLibraryIssues,
+        openBIIssues: openBIIssues,
         openPRs: openPRs,
         latestRelease: latestRelease,
         hasBuild: hasBuild,
