@@ -51,6 +51,7 @@ public type ProductInfo record {
     int openDocsPRs;
     string latestRelease;
     boolean hasBuild;
+    BugInfo? bugInfo;
 };
 
 public type ModuleInfo record {
@@ -67,6 +68,7 @@ public type ModuleInfo record {
     string latestRelease;
     boolean hasBuild;
     string? codeCoverage;
+    BugInfo? bugInfo;
 };
 
 public type ToolInfo record {
@@ -83,6 +85,7 @@ public type ToolInfo record {
     string latestRelease;
     boolean hasBuild;
     string? codeCoverage;
+    BugInfo? bugInfo;
 };
 
 // GitHub API response types
@@ -99,3 +102,10 @@ public type GitHubRelease record {
 };
 
 public type GitHubClient http:Client;
+
+public type BugInfo record {
+    int totalBugs;
+    int highPriorityBugs;
+    int normalPriorityBugs;
+    int lowPriorityBugs;
+};
