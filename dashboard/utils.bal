@@ -33,8 +33,8 @@ public function generateDashboard(ProductInfo[] products, ModuleInfo[] modules, 
 // Generate products section for dashboard
 function generateProductsSection(ProductInfo[] products) returns string {
     string dashboard = "## Products" + "\n\n";
-    dashboard += "| Product Name | Latest Release | Open Product Issues | Open Product PRs | Open Documentation Issues | Open Documentation PRs | Build Status |" + "\n";
-    dashboard += "|--------------|----------------|---------------------|------------------|---------------------------|------------------------|--------------|" + "\n";
+    dashboard += "| Product Name | Latest Release | Open Product Issues | Total Bugs | High Priority Bugs | Open Product PRs | Open Documentation Issues | Open Documentation PRs | Build Status |" + "\n";
+    dashboard += "|--------------|----------------|---------------------|------------|-------------------|------------------|---------------------------|------------------------|--------------|" + "\n";
 
     foreach ProductInfo product in products {
         string productLink = string `[${product.name}](https://github.com/${product.githubOrg}/${product.productRepo})`;
@@ -46,8 +46,12 @@ function generateProductsSection(ProductInfo[] products) returns string {
         string productPRsLink = string `[${product.openPRs}](https://github.com/${product.githubOrg}/${product.productRepo}/pulls)`;
         string docsIssuesLink = string `[${product.openDocsIssues}](https://github.com/${product.githubOrg}/${product.docsRepo}/issues)`;
         string docsPRsLink = string `[${product.openDocsPRs}](https://github.com/${product.githubOrg}/${product.docsRepo}/pulls)`;
+        string totalBugsLink = product.bugInfo is () ? "N/A" : 
+            string `[${(<BugInfo>product.bugInfo).totalBugs}](https://github.com/${product.githubOrg}/${product.productRepo}/issues?q=is:issue+is:open+label:Type/Bug)`;        
+        string highPriorityBugsLink = product.bugInfo is () ? "N/A" : 
+            string `[${(<BugInfo>product.bugInfo).highPriorityBugs}](https://github.com/${product.githubOrg}/${product.productRepo}/issues?q=is:issue+is:open+label:Type/Bug+label:Priority/High)`;
 
-        dashboard += string `| ${productLink} | ${product.latestRelease} | ${productIssuesLink} | ${productPRsLink} | ${docsIssuesLink} | ${docsPRsLink} | ${buildBadge} |` + "\n";
+        dashboard += string `| ${productLink} | ${product.latestRelease} | ${productIssuesLink} | ${totalBugsLink} | ${highPriorityBugsLink} | ${productPRsLink} | ${docsIssuesLink} | ${docsPRsLink} | ${buildBadge} |` + "\n";
     }
 
     return dashboard;
@@ -56,8 +60,8 @@ function generateProductsSection(ProductInfo[] products) returns string {
 // Generate modules section for dashboard
 function generateModulesSection(ModuleInfo[] modules) returns string {
     string dashboard = "## Modules" + "\n\n";
-    dashboard += "| Module Name | Latest Release | Open Library Issues | Open BI Issues | Open Module PRs | Build Status | Code Coverage |" + "\n";
-    dashboard += "|-------------|----------------|---------------------|----------------|-----------------|--------------|---------------|" + "\n";
+    dashboard += "| Module Name | Latest Release | Open Library Issues | Open BI Issues | Total Bugs | High Priority Bugs | Open Module PRs | Build Status | Code Coverage |" + "\n";
+    dashboard += "|-------------|----------------|---------------------|----------------|------------|-------------------|-----------------|--------------|---------------|" + "\n";
 
     foreach ModuleInfo module in modules {
         string moduleLink = string `[${module.name}](https://github.com/${module.githubOrg}/${module.moduleRepo})`;
@@ -72,7 +76,13 @@ function generateModulesSection(ModuleInfo[] modules) returns string {
         string biIssuesLink = string `[${module.openBIIssues}](https://github.com/wso2/product-ballerina-integrator/issues?q=is:open+label:${encodedBiLabel})`;
         string prsLink = string `[${module.openPRs}](https://github.com/${module.githubOrg}/${module.moduleRepo}/pulls)`;
 
-        dashboard += string `| ${moduleLink} | ${module.latestRelease} | ${libraryIssuesLink} | ${biIssuesLink} | ${prsLink} | ${buildBadge} | ${coverageBadge} |` + "\n";
+        string totalBugsLink = module.bugInfo is () ? "N/A" : 
+            string `[${(<BugInfo>module.bugInfo).totalBugs}](https://github.com/ballerina-platform/ballerina-library/issues?q=is:open+label:${encodedLibraryLabel}+label:Type/Bug)`;
+
+        string highPriorityBugsLink = module.bugInfo is () ? "N/A" : 
+            string `[${(<BugInfo>module.bugInfo).highPriorityBugs}](https://github.com/ballerina-platform/ballerina-library/issues?q=is:open+label:${encodedLibraryLabel}+label:Type/Bug+label:Priority/High)`;
+
+        dashboard += string `| ${moduleLink} | ${module.latestRelease} | ${libraryIssuesLink} | ${biIssuesLink} | ${totalBugsLink} | ${highPriorityBugsLink} | ${prsLink} | ${buildBadge} | ${coverageBadge} |` + "\n";
     }
 
     return dashboard;
@@ -81,8 +91,8 @@ function generateModulesSection(ModuleInfo[] modules) returns string {
 // Generate tools section for dashboard
 function generateToolsSection(ToolInfo[] tools) returns string {
     string dashboard = "## Tools" + "\n\n";
-    dashboard += "| Tool Name | Latest Release | Open Library Issues | Open BI Issues | Open Tool PRs | Build Status | Code Coverage |" + "\n";
-    dashboard += "|-----------|----------------|---------------------|----------------|---------------|--------------|---------------|" + "\n";
+    dashboard += "| Tool Name | Latest Release | Open Library Issues | Open BI Issues | Total Bugs | High Priority Bugs | Open Tool PRs | Build Status | Code Coverage |" + "\n";
+    dashboard += "|-----------|----------------|---------------------|----------------|------------|-------------------|---------------|--------------|---------------|" + "\n";
 
     foreach ToolInfo tool in tools {
         string toolLink = string `[${tool.name}](https://github.com/${tool.githubOrg}/${tool.toolRepo})`;
@@ -97,7 +107,13 @@ function generateToolsSection(ToolInfo[] tools) returns string {
         string biIssuesLink = string `[${tool.openBIIssues}](https://github.com/wso2/product-ballerina-integrator/issues?q=is:open+label:${encodedBiLabel})`;
         string prsLink = string `[${tool.openPRs}](https://github.com/${tool.githubOrg}/${tool.toolRepo}/pulls)`;
 
-        dashboard += string `| ${toolLink} | ${tool.latestRelease} | ${libraryIssuesLink} | ${biIssuesLink} | ${prsLink} | ${buildBadge} | ${coverageBadge} |` + "\n";
+        string totalBugsLink = tool.bugInfo is () ? "N/A" : 
+            string `[${(<BugInfo>tool.bugInfo).totalBugs}](https://github.com/ballerina-platform/ballerina-library/issues?q=is:issue+is:open+label:${encodedLibraryLabel}+label:Type/Bug)`;
+
+        string highPriorityBugsLink = tool.bugInfo is () ? "N/A" : 
+            string `[${(<BugInfo>tool.bugInfo).highPriorityBugs}](https://github.com/ballerina-platform/ballerina-library/issues?q=is:open+label:${encodedLibraryLabel}+label:Type/Bug+label:Priority/High)`;
+
+        dashboard += string `| ${toolLink} | ${tool.latestRelease} | ${libraryIssuesLink} | ${biIssuesLink} | ${totalBugsLink} | ${highPriorityBugsLink} | ${prsLink} | ${buildBadge} | ${coverageBadge} |` + "\n";
     }
 
     return dashboard;
