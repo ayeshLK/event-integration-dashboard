@@ -26,13 +26,16 @@ jobs:
         git checkout -b weekly-update || git checkout weekly-update
         git pull origin master
 
-    - name: Update the dependencies and generate the dashboard
-      uses: ballerina-platform/ballerina-action@2201.12.3
-      with: 
-        args: run
+    - name: Setup Ballerina
+      uses: ballerina-platform/setup-ballerina@v1.1.3
+      with:
+        version: 2201.12.3
+
+    - name: Generate dashboard
+      run: bal run
+      working-directory: ./dashboard
       env:
-        WORKING_DIR: ./dashboard
-        DASHBOARD_TOKEN: ${{ secrets.DASHBOARD_TOKEN }}
+        BALLERINA_BOT_TOKEN: ${{ secrets.DASHBOARD_TOKEN }}
 
     - name: Commit changes
       id: commitFiles
