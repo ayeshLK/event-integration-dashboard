@@ -75,7 +75,30 @@ public function getOpenPRsCount(GitHubClient github, string org, string repo) re
     return pulls.length();
 }
 
-// Fetch issues count by label from a repository
+// Fetch issues count by multiple labels from a repository
+public function getIssuesByMultipleLabels(GitHubClient github, string org, string repo, string[] labels) returns int|error {
+    string labelQuery = string:'join(",", ...labels);
+    string path = string `/repos/${org}/${repo}/issues?state=open&labels=${labelQuery}`;
+    json[]|error issues = github->get(path);
+
+    if issues is error {
+        log:printWarn(string `Failed to fetch issues for ${org}/${repo} with labels ${labelQuery}: ${issues.message()}`);
+        return 0;
+    }
+
+    // Filter out pull requests (issues API returns both issues and PRs)
+    int count = 0;
+    foreach json issue in issues {
+        if issue is map<json> {
+            // Check if this is a pull request by looking for 'pull_request' field
+            if !issue.hasKey("pull_request") {
+                count += 1;
+            }
+        }
+    }
+
+    return count;
+}
 public function getIssuesByLabel(GitHubClient github, string org, string repo, string label) returns int|error {
     string path = string `/repos/${org}/${repo}/issues?state=open&labels=${label}`;
     json[]|error issues = github->get(path);
@@ -97,6 +120,34 @@ public function getIssuesByLabel(GitHubClient github, string org, string repo, s
     }
 
     return count;
+}
+
+// get bug information
+public function getBugInfo(GitHubClient github, string org, string repo, string? moduleLabel = ()) returns BugInfo|error {
+    string[] bugLabels;
+    if moduleLabel is () {
+        bugLabels = ["Type/Bug"];
+    } else {
+        bugLabels = [moduleLabel, "Type/Bug"];
+    }
+    
+    int totalBugs = check getIssuesByMultipleLabels(github, org, repo, bugLabels);
+    
+    string[] highPriorityLabels = [...bugLabels, "Priority/High"];
+    int highPriorityBugs = check getIssuesByMultipleLabels(github, org, repo, highPriorityLabels);
+    
+    string[] normalPriorityLabels = [...bugLabels, "Priority/Normal"];
+    int normalPriorityBugs = check getIssuesByMultipleLabels(github, org, repo, normalPriorityLabels);
+    
+    string[] lowPriorityLabels = [...bugLabels, "Priority/Low"];
+    int lowPriorityBugs = check getIssuesByMultipleLabels(github, org, repo, lowPriorityLabels);
+    
+    return {
+        totalBugs: totalBugs,
+        highPriorityBugs: highPriorityBugs,
+        normalPriorityBugs: normalPriorityBugs,
+        lowPriorityBugs: lowPriorityBugs
+    };
 }
 
 // Check if repository has GitHub Actions workflow
@@ -161,7 +212,8 @@ public function fetchProductInfo(GitHubClient github, Product product) returns P
         openDocsIssues: openDocsIssues,
         openDocsPRs: openDocsPRs,
         latestRelease: latestRelease,
-        hasBuild: hasBuild
+        hasBuild: hasBuild,
+        bugInfo: check getBugInfo(github, githubOrg, productRepo)
     };
 }
 
@@ -196,7 +248,8 @@ public function fetchModuleInfo(GitHubClient github, Module module) returns Modu
         openPRs: openPRs,
         latestRelease: latestRelease,
         hasBuild: hasBuild,
-        codeCoverage: () // TODO: Fetch from CodeCov API if needed
+        codeCoverage: (), // TODO: Fetch from CodeCov API if needed
+        bugInfo: check getBugInfo(github, "ballerina-platform", "ballerina-library", libraryLabel)
     };
 }
 
@@ -229,6 +282,7 @@ public function fetchToolInfo(GitHubClient github, Tool tool) returns ToolInfo|e
         openPRs: openPRs,
         latestRelease: latestRelease,
         hasBuild: hasBuild,
-        codeCoverage: () // TODO: Fetch from CodeCov API if needed
+        codeCoverage: (), // TODO: Fetch from CodeCov API if needed
+        bugInfo: check getBugInfo(github, "ballerina-platform", "ballerina-library", tool.'library\-label)
     };
 }
